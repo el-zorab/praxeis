@@ -1,0 +1,9 @@
+.vscode
+iso_root
+limine
+src/limine.h
+src/symtab/symtab.c
+*.d
+*.elf
+*.iso
+*.o
