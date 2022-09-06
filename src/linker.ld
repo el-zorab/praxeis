@@ -14,12 +14,15 @@ SECTIONS
 {
     . = 0xffffffff80000000;
     
+    text_start_address = .;
     .text : {
         *(.text .text.*)
     } :text
+    text_end_address = .;
 
     . += CONSTANT(MAXPAGESIZE);
 
+    rodata_start_address = .;
     .rodata : {
         *(.rodata .rodata.*)
     } :rodata
@@ -27,9 +30,11 @@ SECTIONS
     .symbol_table : {
         *(.symbol_table)
     } :rodata
+    rodata_end_address = .;
 
     . += CONSTANT(MAXPAGESIZE);
 
+    data_start_address = .;
     .data : {
         *(.data .data.*)
     } :data
@@ -38,8 +43,7 @@ SECTIONS
         *(COMMON)
         *(.bss .bss.*)
     } :data
-
-    elf_end_address = .;
+    data_end_address = .;
 
     /DISCARD/ : {
         *(.eh_frame)
