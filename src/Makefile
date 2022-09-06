@@ -1,6 +1,8 @@
-KERNEL := kernel.elf
+KERNEL         := kernel.elf
 GEN_SYM_SCRIPT := gen_symtab.sh
-SYMBOL_TABLE := symtab/symtab.c
+SYMTAB_FILE        := symtab/symtab.c
+SYMTAB_OBJ         := symtab/symtab.o
+SYMTAB_PLACEHOLDER := symtab/symtab-placeholder
 
 CC := x86_64-elf-gcc
 AS := nasm
@@ -42,20 +44,28 @@ HEADER_DEPS := $(C_SRC:.c=.d)
 .PHONY: all
 all: $(KERNEL)
 
+# Build kernel with hacky workaround for symbol table
 $(KERNEL): $(OBJ)
-	$(LD) $(OBJ) $(LDFLAGS) $(INTERNALLDFLAGS) -o $@
-	$(MAKE) gen-sym
+	if ! [ -f "$(SYMTAB_FILE)" ]; \
+	then \
+		cp $(SYMTAB_PLACEHOLDER) $(SYMTAB_FILE); \
+		$(MAKE) compile-symtab; \
+		$(LD) $(OBJ) $(SYMTAB_OBJ) $(LDFLAGS) $(INTERNALLDFLAGS) -o $@; \
+	fi;
+	./$(GEN_SYM_SCRIPT) $(KERNEL) $(SYMTAB_FILE)
+	$(MAKE) compile-symtab
+	$(LD) $(OBJ) $(SYMTAB_OBJ) $(LDFLAGS) $(INTERNALLDFLAGS) -o $@
 
-.PHONY: gen-sym
-gen-sym:
-	./$(GEN_SYM_SCRIPT) $(KERNEL) $(SYMBOL_TABLE)
-
-%_asm.o: %.asm
-	$(AS) $(ASFLAGS) $< -o $@
+.PHONY: compile-symtab
+compile-symtab:
+	$(CC) $(CFLAGS) $(INTERNALCFLAGS) -c $(SYMTAB_FILE) -o $(SYMTAB_OBJ)
 
 -include $(HEADER_DEPS)
 %.o: %.c
 	$(CC) $(CFLAGS) $(INTERNALCFLAGS) -c $< -o $@
+
+%_asm.o: %.asm
+	$(AS) $(ASFLAGS) $< -o $@
 
 .PHONY: limine
 limine:
@@ -63,7 +73,7 @@ limine:
 
 .PHONY: clean
 clean:
-	rm -rf $(KERNEL) $(OBJ) $(HEADER_DEPS)
+	rm -rf $(KERNEL) $(OBJ) $(HEADER_DEPS) $(SYMTAB_FILE)
 
 .PHONY: distclean
 distclean:
