@@ -24,6 +24,7 @@ debug-gdb: $(ISO_IMAGE)
 limine:
 	git clone https://github.com/limine-bootloader/limine.git --branch=v4.x-branch-binary --depth=1
 	$(MAKE) -C src limine
+	$(MAKE) -C limine
 
 .PHONY: kernel
 kernel:
