@@ -76,5 +76,5 @@ clean:
 	rm -rf $(KERNEL) $(OBJ) $(HEADER_DEPS) $(SYMTAB_FILE)
 
 .PHONY: distclean
-distclean:
+distclean: clean
 	rm -f limine.h
