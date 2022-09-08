@@ -45,6 +45,10 @@ SECTIONS
     } :data
     data_end_address = .;
 
+    .limine_reqs : {
+        KEEP(*(.limine_reqs))
+    } :rodata
+
     /DISCARD/ : {
         *(.eh_frame)
         *(.note .note.*)
