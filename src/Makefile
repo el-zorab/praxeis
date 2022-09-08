@@ -42,7 +42,9 @@ OBJ         += $(ASM_SRC:.asm=_asm.o)
 HEADER_DEPS := $(C_SRC:.c=.d)
 
 .PHONY: all
-all: $(KERNEL)
+all:
+	$(MAKE) clean
+	$(MAKE) $(KERNEL)
 
 # Build kernel with hacky workaround for symbol table
 $(KERNEL): $(OBJ)
