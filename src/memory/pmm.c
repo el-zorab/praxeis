@@ -123,3 +123,12 @@ void pmm_free(void *pointer, uint64_t pages_count) {
     }
     free_pages += pages_count;
 }
+
+void pmm_reclaim_bootloader_memory(struct limine_memmap_response *memmap) {
+    for (uint64_t i = 0; i < memmap->entry_count; i++) {
+        struct limine_memmap_entry *current_entry = memmap->entries[i];
+        if (current_entry->type == LIMINE_MEMMAP_BOOTLOADER_RECLAIMABLE) {
+            pmm_free((void*) current_entry->base, current_entry->length / PAGE_SIZE);
+        }
+    }
+}

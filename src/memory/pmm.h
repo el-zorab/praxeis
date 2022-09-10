@@ -9,3 +9,4 @@
 void pmm_init(struct limine_memmap_response *memmap);
 void *pmm_alloc(uint64_t pages_count, bool sanitize);
 void pmm_free(void *pointer, uint64_t pages_count);
+void pmm_reclaim_bootloader_memory(struct limine_memmap_response *memmap);

@@ -66,6 +66,7 @@ void kmain(void) {
     madt_init();
     hpet_init();
     smp_init(smp_response);
+    pmm_reclaim_bootloader_memory(memmap_response);
 
     panic("Reached end of kernel entry point", true);
 }
