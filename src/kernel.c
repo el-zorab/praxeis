@@ -52,8 +52,10 @@ void kmain(void) {
     printf("\nPraxeis booted by %s v%s\n\n", bootloader_info_response->name, bootloader_info_response->version);
 
     uint32_t eax, ebx, ecx, edx;
-    cpuid(0, 0, &eax, &ebx, &ecx, &edx);
+    cpuid(0x80000001, 0, &eax, &ebx, &ecx, &edx);
+    if (!(edx & (1 << 20))) panic("NX bit not available", false);
 
+    cpuid(0, 0, &eax, &ebx, &ecx, &edx);
     printf("CPU Vendor String = %.4s%.4s%.4s\n", (const char*) &ebx, (const char*) &edx, (const char*) &ecx);
 
     gdt_init();

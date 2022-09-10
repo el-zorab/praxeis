@@ -5,8 +5,9 @@
 #include "util/math.h"
 #include "x86/cpu.h"
 
-#define PTE_PRESENT  0x1
-#define PTE_WRITABLE 0x2
+#define PTE_PRESENT  (1ULL << 0)
+#define PTE_WRITABLE (1ULL << 1)
+#define PTE_NX       (1ULL << 63)
 
 static uint64_t *kernel_pagemap;
 static uint8_t la57_enabled;
@@ -24,7 +25,7 @@ static uint64_t *vmm_get_next_pml(uintptr_t *pml, uint64_t pml_index) {
     return (uint64_t*) ((pml[pml_index] & ~(0x1ff)) + hhdm_offset);
 }
 
-void vmm_map_page(uint64_t *pagemap, uintptr_t virtual_address, uintptr_t physical_address, uint16_t flags) {
+void vmm_map_page(uint64_t *pagemap, uintptr_t virtual_address, uintptr_t physical_address, uint64_t flags) {
     uint64_t *pml4;
     if (la57_enabled) {
         uint64_t pml5_index = (virtual_address & ((uint64_t) 0x1ff << 48)) >> 48;
@@ -62,7 +63,7 @@ void vmm_init(struct limine_memmap_response *memmap, struct limine_kernel_addres
     kernel_pagemap = (uint64_t*) ((uintptr_t) pmm_alloc(1, true) + hhdm_offset);
 
     for (uintptr_t i = 0x1000; i < 0x100000000; i += PAGE_SIZE) {
-        vmm_map_page(kernel_pagemap, i + hhdm_offset, i, PTE_PRESENT | PTE_WRITABLE);
+        vmm_map_page(kernel_pagemap, i + hhdm_offset, i, PTE_PRESENT | PTE_WRITABLE | PTE_NX);
     }
 
     printf("VMM: Higher half mapping done\n");
@@ -81,11 +82,11 @@ void vmm_init(struct limine_memmap_response *memmap, struct limine_kernel_addres
     }
 
     for (uintptr_t i = rodata_start; i < rodata_end; i += PAGE_SIZE) {
-        vmm_map_page(kernel_pagemap, i, i - section_offset, PTE_PRESENT);
+        vmm_map_page(kernel_pagemap, i, i - section_offset, PTE_PRESENT | PTE_NX);
     }
 
     for (uintptr_t i = data_start; i < data_end; i += PAGE_SIZE) {
-        vmm_map_page(kernel_pagemap, i, i - section_offset, PTE_PRESENT | PTE_WRITABLE);
+        vmm_map_page(kernel_pagemap, i, i - section_offset, PTE_PRESENT | PTE_WRITABLE | PTE_NX);
     }
 
     printf("VMM: Kernel mapping done\n");
@@ -108,7 +109,7 @@ void vmm_init(struct limine_memmap_response *memmap, struct limine_kernel_addres
 
         for (uintptr_t j = base; j < top; j += PAGE_SIZE) {
             vmm_map_page(kernel_pagemap, j, j, PTE_PRESENT | PTE_WRITABLE);
-            vmm_map_page(kernel_pagemap, j + hhdm_offset, j, PTE_PRESENT | PTE_WRITABLE);
+            vmm_map_page(kernel_pagemap, j + hhdm_offset, j, PTE_PRESENT | PTE_WRITABLE | PTE_NX);
         }
     }
     
