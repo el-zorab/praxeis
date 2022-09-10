@@ -108,7 +108,6 @@ void vmm_init(struct limine_memmap_response *memmap, struct limine_kernel_addres
         }
 
         for (uintptr_t j = base; j < top; j += PAGE_SIZE) {
-            vmm_map_page(kernel_pagemap, j, j, PTE_PRESENT | PTE_WRITABLE);
             vmm_map_page(kernel_pagemap, j + hhdm_offset, j, PTE_PRESENT | PTE_WRITABLE | PTE_NX);
         }
     }
