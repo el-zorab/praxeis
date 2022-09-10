@@ -15,8 +15,10 @@ extern uint8_t halt_vector;
 void panic(const char *message, bool do_stacktrace, ...) {
     __asm__ volatile("cli");
 
-    lapic_send_ipi(0, halt_vector, LAPIC_IPI_DEST_EXCL_SELF);
-    hpet_msleep(10);
+    if (smp_is_init()) {
+        lapic_send_ipi(0, halt_vector, LAPIC_IPI_DEST_EXCL_SELF);
+        hpet_msleep(10);
+    }
 
     fb_prepare_color(FRAMEBUFFER_COLOR_PANIC);
     if (get_cpu_local() == NULL) {

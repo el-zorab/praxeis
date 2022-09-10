@@ -17,4 +17,5 @@ typedef struct {
 } cpu_local_t;
 
 void smp_init(struct limine_smp_response *smp);
+bool smp_is_init(void);
 cpu_local_t *get_cpu_local(void);

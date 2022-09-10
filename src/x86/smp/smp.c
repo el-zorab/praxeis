@@ -9,6 +9,7 @@
 #include "x86/interrupts/idt.h"
 #include "x86/smp/smp.h"
 
+static bool is_smp_init = false;
 static uint16_t started_cpus_counter;
 
 extern uint64_t hhdm_offset;
@@ -63,6 +64,12 @@ void smp_init(struct limine_smp_response *smp) {
     while (started_cpus_counter != smp->cpu_count) {
         __asm__ volatile("pause");
     }
+
+    is_smp_init = true;
+}
+
+bool smp_is_init(void) {
+    return is_smp_init;
 }
 
 cpu_local_t *get_cpu_local(void) {
