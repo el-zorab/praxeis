@@ -32,16 +32,14 @@ uintptr_t requests[] = {
 uint64_t hhdm_offset;
 
 void kmain(void) {
-    uint8_t requests_counter = 0;
-    // These must be in the same order as in the requests array
-    struct limine_5_level_paging_response  *five_level_paging_response = ((struct limine_5_level_paging_request*)  requests[requests_counter++])->response;
-    struct limine_bootloader_info_response *bootloader_info_response   = ((struct limine_bootloader_info_request*) requests[requests_counter++])->response;
-    struct limine_framebuffer_response     *framebuffer_response       = ((struct limine_framebuffer_request*)     requests[requests_counter++])->response;
-    struct limine_hhdm_response            *hhdm_response              = ((struct limine_hhdm_request*)            requests[requests_counter++])->response;
-    struct limine_kernel_address_response  *kernel_address_response    = ((struct limine_kernel_address_request*)  requests[requests_counter++])->response;
-    struct limine_memmap_response          *memmap_response            = ((struct limine_memmap_request*)          requests[requests_counter++])->response;
-    struct limine_rsdp_response            *rsdp_response              = ((struct limine_rsdp_request*)            requests[requests_counter++])->response;
-    struct limine_smp_response             *smp_response               = ((struct limine_smp_request*)             requests[requests_counter++])->response;
+    struct limine_5_level_paging_response  *five_level_paging_response = ((struct limine_5_level_paging_request*)  requests[0])->response;
+    struct limine_bootloader_info_response *bootloader_info_response   = ((struct limine_bootloader_info_request*) requests[1])->response;
+    struct limine_framebuffer_response     *framebuffer_response       = ((struct limine_framebuffer_request*)     requests[2])->response;
+    struct limine_hhdm_response            *hhdm_response              = ((struct limine_hhdm_request*)            requests[3])->response;
+    struct limine_kernel_address_response  *kernel_address_response    = ((struct limine_kernel_address_request*)  requests[4])->response;
+    struct limine_memmap_response          *memmap_response            = ((struct limine_memmap_request*)          requests[5])->response;
+    struct limine_rsdp_response            *rsdp_response              = ((struct limine_rsdp_request*)            requests[6])->response;
+    struct limine_smp_response             *smp_response               = ((struct limine_smp_request*)             requests[7])->response;
 
     hhdm_offset = hhdm_response->offset;
 
