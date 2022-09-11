@@ -1,8 +1,8 @@
 #include <stddef.h>
 #include "acpi/acpi.h"
 #include "framebuffer/framebuffer.h"
+#include "lib/misc/memutil.h"
 #include "lib/printf/printf.h"
-#include "util/memutil.h"
 
 typedef struct {
     uint8_t signature[8];

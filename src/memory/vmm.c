@@ -1,8 +1,9 @@
 #include <stddef.h>
 #include "memory/pmm.h"
 #include "memory/vmm.h"
+#include "lib/misc/math.h"
+#include "lib/misc/memutil.h"
 #include "lib/printf/printf.h"
-#include "util/math.h"
 #include "x86/cpu.h"
 
 #define PTE_PRESENT  (1ULL << 0)

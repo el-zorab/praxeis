@@ -1,4 +1,4 @@
-#include "util/memutil.h"
+#include "lib/misc/memutil.h"
 
 int memcmp(const char *s1, const char *s2, size_t n) {
     while (n && *s1 && (*s1 == *s2)) {

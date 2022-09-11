@@ -1,10 +1,11 @@
 #include <limine.h>
 #include <stddef.h>
 #include "lib/bitmap/bitmap.h"
+#include "lib/misc/math.h"
+#include "lib/misc/memutil.h"
 #include "lib/panic/panic.h"
 #include "lib/printf/printf.h"
 #include "memory/pmm.h"
-#include "util/math.h"
 
 static bitmap_t bitmap;
 static uint64_t highest_usable_page_index;
