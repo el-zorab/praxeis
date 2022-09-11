@@ -15,28 +15,40 @@ static uint64_t cached_page_index;
 extern uint64_t hhdm_offset;
 
 void pmm_init(struct limine_memmap_response *memmap) {
-    struct limine_memmap_entry *current_entry;
     uint64_t highest_usable_page = 0, memmap_entry_top = 0;
-    uint8_t found_usable_entries = 0;
+
+    uint64_t memory_usages[3] = {0, 0, 0};
+    uint64_t total_pages = 0;
 
     for (uint64_t i = 0; i < memmap->entry_count; i++) {
-        current_entry = memmap->entries[i];
-        if (current_entry->type == LIMINE_MEMMAP_USABLE) {
-            found_usable_entries = 1;
-            memmap_entry_top = current_entry->base + current_entry->length;
-            if (highest_usable_page < memmap_entry_top) {
-                highest_usable_page = memmap_entry_top;
-            }
-        }
-    }
+        struct limine_memmap_entry *current_entry = memmap->entries[i];
 
-    if (!found_usable_entries) panic("No usable physical memory entries", false);
+        switch (current_entry->type) {
+            case LIMINE_MEMMAP_USABLE:
+                memmap_entry_top = current_entry->base + current_entry->length;
+                if (highest_usable_page < memmap_entry_top) {
+                    highest_usable_page = memmap_entry_top;
+                }
+                break;
+            case LIMINE_MEMMAP_RESERVED:
+                memory_usages[0] += current_entry->length / PAGE_SIZE;
+                break;
+            case LIMINE_MEMMAP_BOOTLOADER_RECLAIMABLE:
+                memory_usages[1] += current_entry->length / PAGE_SIZE;
+                break;
+            case LIMINE_MEMMAP_KERNEL_AND_MODULES:
+                memory_usages[2] += current_entry->length / PAGE_SIZE;
+                break;
+        }
+
+        total_pages += current_entry->length / PAGE_SIZE;
+    }
 
     highest_usable_page_index = highest_usable_page / PAGE_SIZE;
     bitmap.size = align_up(highest_usable_page_index / 8, PAGE_SIZE);
     
     for (uint64_t i = 0; i < memmap->entry_count; i++) {
-        current_entry = memmap->entries[i];
+        struct limine_memmap_entry *current_entry = memmap->entries[i];
 
         if (current_entry->type != LIMINE_MEMMAP_USABLE) {
             continue;
@@ -55,7 +67,7 @@ void pmm_init(struct limine_memmap_response *memmap) {
 
     uint64_t page_index_start, page_index_end;
     for (uint64_t i = 0; i < memmap->entry_count; i++) {
-        current_entry = memmap->entries[i];
+        struct limine_memmap_entry *current_entry = memmap->entries[i];
         if (current_entry->type != LIMINE_MEMMAP_USABLE) {
             continue;
         }
@@ -69,7 +81,9 @@ void pmm_init(struct limine_memmap_response *memmap) {
         }
     }
 
-    printf("PMM initialized (%llu free pages)\n", free_pages);
+    printf("Approximate physical memory usages out of total %lluMiB:\n  %lluMiB Usable  %lluMiB Reserved\n  %lluMiB Bl. Recl.  %lluMiB Kernel/Modules\n",
+        total_pages / 256, free_pages / 256, memory_usages[0] / 256,  memory_usages[1] / 256, memory_usages[2] / 256);
+    printf("PMM initialized\n");
 }
 
 static void *pmm_search_free_pages(uint64_t pages_count, uint64_t page_index_start, uint64_t page_index_end) {
