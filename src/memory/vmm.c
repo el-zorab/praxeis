@@ -58,16 +58,11 @@ void vmm_init(struct limine_memmap_response *memmap, struct limine_kernel_addres
     la57_enabled = five_level_paging != NULL;
     printf("VMM: 5-level paging %s\n", la57_enabled ? "supported" : "not supported");
 
-    printf("VMM: Kernel physical address = 0x%016llx\n", kernel_address->physical_base);
-    printf("VMM: Kernel virtual address  = 0x%016llx\n", kernel_address->virtual_base);
-
     kernel_pagemap = (uint64_t*) ((uintptr_t) pmm_alloc(1, true) + hhdm_offset);
 
     for (uintptr_t i = 0x1000; i < 0x100000000; i += PAGE_SIZE) {
         vmm_map_page(kernel_pagemap, i + hhdm_offset, i, PTE_PRESENT | PTE_WRITABLE | PTE_NX);
     }
-
-    printf("VMM: Higher half mapping done\n");
 
     uintptr_t text_start   = align_down((uintptr_t) text_start_address, PAGE_SIZE);
     uintptr_t rodata_start = align_down((uintptr_t) rodata_start_address, PAGE_SIZE);
@@ -90,8 +85,6 @@ void vmm_init(struct limine_memmap_response *memmap, struct limine_kernel_addres
         vmm_map_page(kernel_pagemap, i, i - section_offset, PTE_PRESENT | PTE_WRITABLE | PTE_NX);
     }
 
-    printf("VMM: Kernel mapping done\n");
-
     struct limine_memmap_entry *current_entry;
     uintptr_t base, top;
     for (uint64_t i = 0; i < memmap->entry_count; i++) {
@@ -112,8 +105,6 @@ void vmm_init(struct limine_memmap_response *memmap, struct limine_kernel_addres
             vmm_map_page(kernel_pagemap, j + hhdm_offset, j, PTE_PRESENT | PTE_WRITABLE | PTE_NX);
         }
     }
-    
-    printf("VMM: Memory map mapping done\n");
 
     vmm_load_kernel_pagemap();
 
