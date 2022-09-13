@@ -65,20 +65,13 @@ void pmm_init(struct limine_memmap_response *memmap) {
 
     for (uint64_t i = 0; i < bitmap.size; i++) bitmap.map[i] = 0xff;
 
-    uint64_t page_index_start, page_index_end;
     for (uint64_t i = 0; i < memmap->entry_count; i++) {
         struct limine_memmap_entry *current_entry = memmap->entries[i];
         if (current_entry->type != LIMINE_MEMMAP_USABLE) {
             continue;
         }
 
-        page_index_start = current_entry->base / PAGE_SIZE;
-        page_index_end = page_index_start + current_entry->length / PAGE_SIZE;
-        free_pages += current_entry->length / PAGE_SIZE;
-
-        for (uint64_t bit = page_index_start; bit < page_index_end; bit++) {
-            bitmap_unset_bit(&bitmap, bit);
-        }
+        pmm_free((void*) current_entry->base, current_entry->length / PAGE_SIZE);
     }
 
     printf("Approximate physical memory usages out of total %lluMiB:\n  %lluMiB Usable  %lluMiB Reserved\n  %lluMiB Bl. Recl.  %lluMiB Kernel/Modules\n",
