@@ -30,6 +30,10 @@ SECTIONS
     .symbol_table : {
         *(.symbol_table)
     } :rodata
+
+    .limine_reqs : {
+        KEEP(*(.limine_reqs))
+    } :rodata
     rodata_end_address = .;
 
     . += CONSTANT(MAXPAGESIZE);
@@ -44,10 +48,6 @@ SECTIONS
         *(.bss .bss.*)
     } :data
     data_end_address = .;
-
-    .limine_reqs : {
-        KEEP(*(.limine_reqs))
-    } :rodata
 
     /DISCARD/ : {
         *(.eh_frame)
