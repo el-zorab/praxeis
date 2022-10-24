@@ -52,11 +52,3 @@ clean:
 distclean:
 	rm -rf limine
 	$(MAKE) -C src distclean
-
-.PHONY: updatedist
-updatedist:
-	rm -rf limine
-	$(MAKE) -C src distclean
-	git clone https://github.com/limine-bootloader/limine.git --branch=v3.0-branch-binary --depth=1
-	$(MAKE) -C src limine
-	$(MAKE) -C limine
