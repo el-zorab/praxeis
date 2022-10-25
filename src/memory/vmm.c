@@ -4,7 +4,7 @@
 #include "lib/misc/math.h"
 #include "lib/misc/memutil.h"
 #include "lib/printf/printf.h"
-#include "x86/cpu.h"
+#include "x86/cpu/cpu-wrappers.h"
 
 #define PTE_PRESENT  (1ULL << 0)
 #define PTE_WRITABLE (1ULL << 1)

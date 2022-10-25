@@ -6,7 +6,7 @@
 #include "memory/pmm.h"
 #include "memory/vmm.h"
 #include "x86/apic/lapic.h"
-#include "x86/cpu.h"
+#include "x86/cpu/cpu-wrappers.h"
 #include "x86/interrupts/idt.h"
 #include "x86/smp/smp.h"
 

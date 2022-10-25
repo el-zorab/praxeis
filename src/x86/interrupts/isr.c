@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include "lib/panic/panic.h"
 #include "lib/printf/printf.h"
 

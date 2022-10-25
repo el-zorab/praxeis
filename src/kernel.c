@@ -11,7 +11,7 @@
 #include "memory/vmm.h"
 #include "timer/hpet/hpet.h"
 #include "x86/apic/lapic.h"
-#include "x86/cpu.h"
+#include "x86/cpu/cpu-wrappers.h"
 #include "x86/gdt/gdt.h"
 #include "x86/interrupts/idt.h"
 #include "x86/smp/smp.h"
