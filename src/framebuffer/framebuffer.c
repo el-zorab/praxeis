@@ -13,7 +13,7 @@ static uint32_t fb_color = FRAMEBUFFER_COLOR_BASE;
 static uint64_t x, x_min, x_max;
 static uint64_t y, y_min, y_max;
 
-static spinlock_t lock = SPINLOCK_INIT;
+static struct spinlock lock = SPINLOCK_INIT;
 
 void fb_draw_image(uint64_t x, uint64_t y) {
     uint32_t *address = (uint32_t*) (uintptr_t) (fb_address + (x << 2) + y * fb->pitch);

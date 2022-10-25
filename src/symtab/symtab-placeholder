@@ -1,13 +1,13 @@
 #include <stddef.h>
 #include "symtab/symtab.h"
 
-typedef struct {
+struct symbol {
     uint64_t address;
     const char* name;
-} symbol_t;
+};
 
 __attribute__((section(".symbol_table")))
-static const symbol_t symtab[] = {
+static const struct symbol symtab[] = {
     { .address = UINT64_MAX, .name = "" }
 };
 

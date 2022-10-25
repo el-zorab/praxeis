@@ -16,7 +16,7 @@ static uint16_t started_cpus_counter;
 extern uint64_t hhdm_offset;
 
 static void cpu_init(struct limine_smp_info *cpu) {
-    cpu_local_t *cpu_local = (cpu_local_t*) (uintptr_t) cpu->extra_argument;
+    struct cpu_local *cpu_local = (struct cpu_local*) (uintptr_t) cpu->extra_argument;
 
     gdt_reload();
     idt_reload();
@@ -49,7 +49,7 @@ void smp_init(struct limine_smp_response *smp) {
     for (uint64_t i = 0; i < smp->cpu_count; i++) {
         struct limine_smp_info *current_cpu = smp->cpus[i];
 
-        cpu_local_t *cpu_local = (cpu_local_t*) ((uintptr_t) pmm_alloc(align_up(sizeof(cpu_local_t), PAGE_SIZE) / PAGE_SIZE, true) + hhdm_offset);
+        struct cpu_local *cpu_local = (struct cpu_local*) ((uintptr_t) pmm_alloc(align_up(sizeof(struct cpu_local), PAGE_SIZE) / PAGE_SIZE, true) + hhdm_offset);
         current_cpu->extra_argument = (uint64_t) cpu_local;
         cpu_local->id = i;
         cpu_local->lapic_id = current_cpu->lapic_id;
@@ -73,6 +73,6 @@ bool smp_is_init(void) {
     return is_smp_init;
 }
 
-cpu_local_t *get_cpu_local(void) {
-    return (cpu_local_t*) (uintptr_t) get_gs_base();
+struct cpu_local *get_cpu_local(void) {
+    return (struct cpu_local*) (uintptr_t) get_gs_base();
 }

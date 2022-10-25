@@ -4,10 +4,10 @@
 
 #define SPINLOCK_INIT {0, 0}
 
-typedef struct {
+struct spinlock {
     uint32_t serving_ticket;
     uint32_t next_ticket;
-} spinlock_t;
+};
 
-void spinlock_acquire(spinlock_t *lock);
-void spinlock_release(spinlock_t *lock);
+void spinlock_acquire(struct spinlock *lock);
+void spinlock_release(struct spinlock *lock);

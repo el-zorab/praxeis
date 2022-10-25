@@ -1,14 +1,14 @@
 #include "lib/panic/panic.h"
 #include "lib/printf/printf.h"
 
-typedef struct {
+struct cpu_state {
     uint64_t cr4, cr3, cr2, cr0;
     uint64_t r15, r14, r13, r12, r11, r10, r9, r8;
     uint64_t rdi, rsi, rdx, rcx, rbx, rax;
     uint64_t rbp;
     uint64_t vector, error_code;
     uint64_t rip, cs, rflags, rsp, ss;
-} cpu_state_t;
+};
 
 static char *exception_mnemonics[32] = {
     "DE", "DB", "XX", "BP", "OF", "BR", "UD", "NM",
@@ -55,7 +55,7 @@ static char *exception_names[32] = {
     "Reserved"
 };
 
-__attribute__((noreturn)) void isr_exception_handler(cpu_state_t *cpu_state) {
+__attribute__((noreturn)) void isr_exception_handler(struct cpu_state *cpu_state) {
     printf("\nrax    = 0x%016llx, rbx = 0x%016llx, rcx = 0x%016llx, rdx = 0x%016llx\n", cpu_state->rax, cpu_state->rbx, cpu_state->rcx, cpu_state->rdx);
     printf("rsi    = 0x%016llx, rdi = 0x%016llx, rbp = 0x%016llx, rsp = 0x%016llx\n", cpu_state->rsi, cpu_state->rdi, cpu_state->rbp, cpu_state->rsp);
     printf("cr0    = 0x%016llx, cr2 = 0x%016llx, cr3 = 0x%016llx, cr3 = 0x%016llx\n", cpu_state->cr0, cpu_state->cr2, cpu_state->cr3, cpu_state->cr4);

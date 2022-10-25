@@ -5,8 +5,8 @@
 #include "lib/printf/printf.h"
 #include "timer/hpet/hpet.h"
 
-typedef struct {
-    sdt_header_t header;
+struct __attribute__((packed)) hpet {
+    struct sdt_header header;
     uint8_t hardware_rev_id;
     uint8_t info;
     uint16_t pci_vendor_id;
@@ -18,9 +18,9 @@ typedef struct {
     uint8_t hpet_number;
     uint16_t minimum_tick;
     uint8_t page_protection;
-} __attribute__((packed)) hpet_t;
+};
 
-typedef struct {
+struct __attribute__((packed)) hpet_contents {
     uint64_t general_capabilities;
     uint64_t reserved0;
     uint64_t general_configuration;
@@ -29,10 +29,10 @@ typedef struct {
     uint64_t reserved2[25];
     volatile uint64_t main_counter_value;
     uint64_t reserved3;
-} __attribute__((packed)) hpet_contents_t;
+};
 
-static volatile hpet_t *hpet;
-static volatile hpet_contents_t *hpet_contents;
+static volatile struct hpet *hpet;
+static volatile struct hpet_contents *hpet_contents;
 static uint64_t hpet_period;
 static bool is_hpet_available = false;
 
@@ -43,14 +43,14 @@ bool hpet_available(void) {
 }
 
 void hpet_init(void) {
-    hpet = (hpet_t*) acpi_find_sdt("HPET");
+    hpet = (struct hpet*) acpi_find_sdt("HPET");
     if (hpet == NULL) {
         panic("No HPET found", true);
     }
 
     is_hpet_available = true;
 
-    hpet_contents = (hpet_contents_t*) (uintptr_t) (hpet->address + hhdm_offset);
+    hpet_contents = (struct hpet_contents*) (uintptr_t) (hpet->address + hhdm_offset);
     hpet_contents->main_counter_value = 0;
     hpet_contents->general_configuration = 1;
 

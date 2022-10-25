@@ -13,16 +13,16 @@
 #define GDT_32_BIT      0x40
 #define GDT_GRANULARITY 0x80
 
-typedef struct {
+struct __attribute__((packed)) gdt_descriptor {
     uint16_t limit0;
     uint16_t base0;
     uint8_t base1;
     uint8_t access;
     uint8_t flags_and_limit1;
     uint8_t base2;
-} __attribute__((packed)) gdt_descriptor_t;
+};
 
-typedef struct {
+struct __attribute__((packed)) tss_descriptor {
     uint16_t limit0;
     uint16_t base0;
     uint8_t base1;
@@ -31,20 +31,20 @@ typedef struct {
     uint8_t base2;
     uint32_t base3;
     uint32_t reserved;
-} __attribute__((packed)) tss_descriptor_t;
+};
 
-typedef struct {
-    gdt_descriptor_t descriptors[5];
-    tss_descriptor_t tss_descriptor;
-} gdt_t;
+struct __attribute__((packed)) gdt {
+    struct gdt_descriptor descriptors[5];
+    struct tss_descriptor tss_descriptor;
+};
 
-typedef struct {
+struct __attribute__((packed)) gdtr {
     uint16_t size;
     uint64_t offset;
-} __attribute__((packed)) gdtr_t;
+};
 
-static gdt_t gdt;
-static gdtr_t gdtr;
+static struct gdt gdt;
+static struct gdtr gdtr;
 
 static uint16_t gdt_counter = 0;
 
@@ -79,7 +79,7 @@ void gdt_init(void) {
     gdt_add_descriptor(0, 0         , GDT_PRESENT | GDT_DPL_USER | GDT_CODE_OR_DATA | GDT_RW                 , GDT_GRANULARITY);
 
     // tss descriptor (0x28)
-    gdt.tss_descriptor.limit0 = sizeof(tss_t);
+    gdt.tss_descriptor.limit0 = sizeof(struct tss);
     gdt.tss_descriptor.base0 = 0;
     gdt.tss_descriptor.base1 = 0;
     gdt.tss_descriptor.access = 0x89;
@@ -111,10 +111,10 @@ void gdt_reload(void) {
     );
 }
 
-void gdt_load_tss(tss_t *tss) {
+void gdt_load_tss(struct tss *tss) {
     uintptr_t address = (uintptr_t) tss;
 
-    static spinlock_t lock = SPINLOCK_INIT;
+    static struct spinlock lock = SPINLOCK_INIT;
     spinlock_acquire(&lock);
 
     gdt.tss_descriptor.base0 = (uint16_t) address;

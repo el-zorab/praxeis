@@ -4,7 +4,7 @@
 #include "x86/gdt/gdt.h"
 #include "x86/interrupts/idt.h"
 
-typedef struct {
+struct __attribute__((packed)) idt_descriptor {
     uint16_t offset_0;
     uint16_t gdt_code_selector;
     uint8_t ist;
@@ -12,24 +12,24 @@ typedef struct {
     uint16_t offset_1;
     uint32_t offset_2;
     uint32_t reserved;
-} __attribute__((packed)) idt_descriptor_t;
+};
 
-typedef struct {
+struct __attribute__((packed)) idtr {
     uint16_t size;
     uint64_t offset;
-} __attribute__((packed)) idtr_t;
+};
 
 uint8_t halt_vector;
 
 __attribute__((aligned(0x10)))
-static idt_descriptor_t idt[256];
-static idtr_t idtr;
+static struct idt_descriptor idt[256];
+static struct idtr idtr;
 
 extern void halt_handler(void);
 extern uint64_t isr_table[];
 
 uint8_t idt_allocate_vector(void) {
-    static spinlock_t lock = SPINLOCK_INIT;
+    static struct spinlock lock = SPINLOCK_INIT;
     static uint8_t allocatable_vector = 32;
 
     spinlock_acquire(&lock);
@@ -57,7 +57,7 @@ void idt_set_handler(uint8_t vector, uintptr_t handler) {
 
 void idt_init(void) {
     idtr.offset = (uint64_t) &idt[0];
-    idtr.size = sizeof(idt_descriptor_t) * 256 - 1;
+    idtr.size = sizeof(struct idt_descriptor) * 256 - 1;
 
     for (uint8_t vector = 0; vector < 32; vector++) {
         idt_set_handler(vector, isr_table[vector]);

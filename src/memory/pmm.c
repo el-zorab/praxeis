@@ -7,7 +7,7 @@
 #include "lib/printf/printf.h"
 #include "memory/pmm.h"
 
-static bitmap_t bitmap;
+static struct bitmap bitmap;
 static uint64_t highest_usable_page_index;
 static uint64_t free_pages;
 static uint64_t cached_page_index;

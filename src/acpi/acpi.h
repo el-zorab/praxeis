@@ -3,7 +3,7 @@
 #include <limine.h>
 #include <stdint.h>
 
-typedef struct {
+struct __attribute__((packed)) sdt_header {
     uint8_t signature[4];
     uint32_t length;
     uint8_t revision;
@@ -13,7 +13,7 @@ typedef struct {
     uint32_t oem_revision;
     uint32_t creator_id;
     uint32_t creator_revision;
-} __attribute__((packed)) sdt_header_t;
+};
 
-sdt_header_t *acpi_find_sdt(const char *signature);
+struct sdt_header *acpi_find_sdt(const char *signature);
 void acpi_init(struct limine_rsdp_response *rsdp_response);
