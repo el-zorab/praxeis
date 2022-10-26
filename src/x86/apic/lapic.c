@@ -3,7 +3,7 @@
 #include "lib/printf/printf.h"
 #include "timer/hpet/hpet.h"
 #include "x86/apic/lapic.h"
-#include "x86/smp/smp.h"
+#include "x86/cpu/cpu-local.h"
 
 #define LAPIC_REG_ID 0x20
 #define LAPIC_REG_EOI 0xb0

@@ -6,8 +6,8 @@
 #include "lib/spinlock/spinlock.h"
 #include "lib/stacktrace/stacktrace.h"
 #include "timer/hpet/hpet.h"
-#include "x86/interrupts/idt.h"
 #include "x86/apic/lapic.h"
+#include "x86/cpu/cpu-local.h"
 #include "x86/smp/smp.h"
 
 extern uint8_t halt_vector;

@@ -5,10 +5,11 @@
 #include "lib/printf/printf.h"
 #include "memory/pmm.h"
 #include "memory/vmm.h"
+#include "scheduler/thread.h"
 #include "x86/apic/lapic.h"
+#include "x86/cpu/cpu-local.h"
 #include "x86/cpu/cpu-wrappers.h"
 #include "x86/interrupts/idt.h"
-#include "x86/smp/smp.h"
 
 static bool is_smp_init = false;
 static uint16_t started_cpus_counter;
@@ -28,7 +29,11 @@ static void cpu_init(struct limine_smp_info *cpu) {
     uint64_t *stack = (uint64_t*) ((uintptr_t) pmm_alloc(align_up(CPU_STACK_SIZE, PAGE_SIZE) / PAGE_SIZE, true) + CPU_STACK_SIZE + hhdm_offset);
     cpu_local->tss.rsp[0] = (uint64_t) stack;
 
-    set_gs_base((uint64_t) cpu_local);
+    struct thread *idle_thread = (struct thread*) ((uintptr_t) pmm_alloc(align_up(sizeof(struct thread), PAGE_SIZE) / PAGE_SIZE, true) + hhdm_offset);
+    cpu_local->idle_thread = idle_thread;
+    idle_thread->cpu_local = cpu_local;
+    
+    set_gs_base((uint64_t) idle_thread);
 
     lapic_init();
     __asm__ volatile("sti");
@@ -71,8 +76,4 @@ void smp_init(struct limine_smp_response *smp) {
 
 bool smp_is_init(void) {
     return is_smp_init;
-}
-
-struct cpu_local *get_cpu_local(void) {
-    return (struct cpu_local*) (uintptr_t) get_gs_base();
 }
